@@ -85,9 +85,8 @@ Screenshots
 
 Pipline Sucessfully uning.
 ![image](![Screenshot from 2023-08-16 15-46-47](https://github.com/Abdelfattah1872/Full-Flask-App/assets/57042795/d338af73-4cd7-4874-9c03-48f3206f14b1)
-)
+
 
 
 Application Up and runing
 ![image](![Screenshot from 2023-08-16 15-47-36](https://github.com/Abdelfattah1872/Full-Flask-App/assets/57042795/857403ab-abd1-400d-b313-01fb298af362)
-)
