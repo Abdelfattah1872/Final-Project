@@ -84,7 +84,7 @@ The successful completion of this project highlights the importance of DevOps pr
 Screenshots 
 
 Pipline Sucessfully uning.
-![image](![Screenshot from 2023-08-16 15-46-47](https://github.com/Abdelfattah1872/Full-Flask-App/assets/57042795/d338af73-4cd7-4874-9c03-48f3206f14b1)
+![image]![Screenshot from 2023-08-16 15-46-47](https://github.com/Abdelfattah1872/Full-Flask-App/assets/57042795/d338af73-4cd7-4874-9c03-48f3206f14b1)
 
 
 
