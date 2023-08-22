@@ -1,0 +1,116 @@
+- hosts: ec2_instances
+  become: true
+  tasks:
+    - name: Install the Jenkins GPG key
+      shell: |
+        curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+          /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+
+    - name: Add the Jenkins repository
+      shell: |
+        echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+          https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+          /etc/apt/sources.list.d/jenkins.list > /dev/null
+
+    - name: Create the Jenkins apt repository file
+      file:
+        path: /etc/apt/sources.list.d/jenkins.list
+        state: touch
+
+    - name: Add the Jenkins keyring
+      apt_key:
+        url: https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+        state: present
+
+    - name: Update the apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Java
+      apt:
+        name: openjdk-17-jre
+        state: present
+
+    - name: Add the Jenkins repository
+      apt_repository:
+        repo: deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+          https://pkg.jenkins.io/debian-stable binary/
+        state: present
+
+    - name: Install Jenkins
+      apt:
+        name: jenkins
+        state: present
+
+    - name: "Read a file content"
+      shell: |
+        cat /var/lib/jenkins/secrets/initialAdminPassword
+      register: file_content
+
+    - name: "Print the file content to a console"
+      debug:
+        msg: "{{ file_content.stdout }}"
+
+    - name: "Save the file content to a '$resolve_conf' variable"
+      set_fact:
+        resolve_conf: "{{ file_content.stdout }}"
+
+    - name: "Print the '$resolve_conf' variable"
+      debug:
+        msg: "{{ resolve_conf }}"
+
+- hosts: ec2_instances
+  become: yes
+  tasks:
+    - name: Install the AWS CLI
+      apt:
+        name: awscli
+        state: present
+    - name: Verify the installation
+      command: aws --version
+      register: aws_version
+    - debug:
+        msg: "The AWS CLI is installed. Version: {{ aws_version.stdout }}"
+
+- name: Install kubectl on Ubuntu
+  hosts: ec2_instances
+  become: yes
+  tasks:
+    - name: Install the curl package
+      apt:
+        name: curl
+        state: present
+
+    - name: Download the kubectl binary
+      get_url:
+        url: https://dl.k8s.io/release/v1.24.0/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: 0755
+
+    - name: Make kubectl executable
+      file:
+        path: /usr/local/bin/kubectl
+        state: file
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Add kubectl to the path
+      lineinfile:
+        path: /etc/profile
+        line: export PATH=$PATH:/usr/local/bin/kubectl
+        state: present
+
+    - name: Download the latest version of the kubectl binary
+      command: curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.24.0/bin/linux/amd64/kubectl
+
+    - name: Make the kubectl binary executable
+      file:
+        path: kubectl
+        state: file
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Move the kubectl binary to the /usr/local/bin directory
+      command: sudo mv kubectl /usr/local/bin/
